@@ -1,6 +1,6 @@
 # http-errors-lite
 
-[![NPM Version][npm-version-image]][npm-url]
+[![npm version](https://badge.fury.io/js/http-errors-lite.svg)](https://badge.fury.io/js/http-errors-lite)
 [![NPM Downloads][npm-downloads-image]][node-url]
 [![Node.js Version][node-image]][node-url]
 [![Build Status](https://travis-ci.org/nfp-projects/http-errors-lite.svg?branch=master)](https://travis-ci.org/nfp-projects/http-errors-lite)
@@ -95,4 +95,5 @@ fs.readFile('foo.txt', function (err, buf) {
 [node-url]: https://nodejs.org/en/download
 [npm-downloads-image]: https://badgen.net/npm/dm/http-errors-lite
 [npm-url]: https://npmjs.org/package/http-errors-lite
+[travis-image]: https://travis-ci.org/nfp-projects/http-errors-lite.svg?branch=master
 [travis-url]: https://travis-ci.org/nfp-projects/http-errors-lite
