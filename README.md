@@ -3,7 +3,7 @@
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][node-url]
 [![Node.js Version][node-image]][node-url]
-[![Build Status][travis-image]][travis-url]
+[![Build Status](https://travis-ci.org/nfp-projects/http-errors-lite.svg?branch=master)](https://travis-ci.org/nfp-projects/http-errors-lite)
 
 Create HTTP errors for Express, Koa, Connect, etc. with ease. This is a drop-in replacement for the normal `http-errors` only with zero dependancies and 50% less memory usage (give or take).
 
