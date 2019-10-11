@@ -7,6 +7,32 @@
 
 Create HTTP errors for Express, Koa, Connect, etc. with ease. This is a drop-in replacement for the normal `http-errors` only with zero dependancies and 50% less memory usage (give or take).
 
+## Breaking change to `http-errors`
+
+Normal http-errors doesn't care about the order of arguments but would throw a deprecated error if status was put after the message:
+
+```js
+var createError = require('http-errors')
+// The following would throw deprecated
+createError('Not found', 404) // Should be: createError(404, 'Not Found')
+```
+
+The http-errors-lite takes on this more strictly and cares about ordering more.
+
+```js
+var createError = require('http-errors-lite')
+// All of the following will work as expected:
+createError('Something happened')
+createError('This happened', { props: 42 })
+createError(422, { id: 1 })
+createError(422, 'That is not allowed')
+createError({ id: 3242, test: 'true' })
+// The following however will not work as expected:
+createError('Not found', 404) // Due to status not being in front, will default to 500
+```
+
+As long as you put status in front of message or whatever, you will be fine :)
+
 ## Install
 
 This is a [Node.js](https://nodejs.org/en/) module available through the
