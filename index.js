@@ -12,94 +12,85 @@
  * @private
  */
 
-var deprecate = require('depd')('http-errors')
-var setPrototypeOf = require('setprototypeof')
-var statuses = require('statuses')
-var inherits = require('inherits')
-var toIdentifier = require('toidentifier')
+var util = require('util')
+var statuses = require('./statuses')
+var helper = require('./helpers')
+var __cache = new Map()
 
 /**
- * Module exports.
- * @public
+ * The base error class that all http errors will inherit from.
+ * Allows for easy checking if error is HttpError
  */
 
-module.exports = createError
-module.exports.HttpError = createHttpErrorConstructor()
-
-// Populate exports for all constructors
-populateConstructorExports(module.exports, statuses.codes, module.exports.HttpError)
-
-/**
- * Get the code class of a status code.
- * @private
- */
-
-function codeClass (status) {
-  return Number(String(status).charAt(0) + '00')
+function HttpError () {
+  throw new TypeError('cannot construct abstract class')
 }
+util.inherits(HttpError, Error)
 
 /**
- * Create a new HTTP Error.
+ * Create the HttpError creator.
  *
  * @returns {Error}
  * @public
  */
-
-function createError () {
+function createError (orgStatus, orgMessage, orgProps) {
   // so much arity going on ~_~
   var err
-  var msg
-  var status = 500
-  var props = {}
-  for (var i = 0; i < arguments.length; i++) {
-    var arg = arguments[i]
-    if (arg instanceof Error) {
-      err = arg
-      status = err.status || err.statusCode || status
-      continue
-    }
-    switch (typeof arg) {
-      case 'string':
-        msg = arg
-        break
-      case 'number':
-        status = arg
-        if (i !== 0) {
-          deprecate('non-first-argument status code; replace with createError(' + arg + ', ...)')
-        }
-        break
-      case 'object':
-        props = arg
-        break
-    }
-  }
+  var status = orgStatus
+  var msg = orgMessage
+  var props = orgProps || {}
 
-  if (typeof status === 'number' && (status < 400 || status >= 600)) {
-    deprecate('non-error status code; use only 4xx or 5xx status codes')
-  }
-
-  if (typeof status !== 'number' ||
-    (!statuses[status] && (status < 400 || status >= 600))) {
+  // If not a number, shift to the right
+  if (typeof status !== 'number') {
+    props = msg
+    msg = status
     status = 500
   }
+  // If msg is an error, extract it
+  if (msg instanceof Error) {
+    err = msg
+    msg = statuses[status]
+    status = err.status || err.statusCode || status
+  }
+  // If status is in invalid range, force it to 500
+  if (!statuses[status] && (status < 400 || status >= 600)) {
+    status = 500
+  }
+  // Lastly, if we don't have a message (but props instead)
+  // Move it over and grab the message from statuses
+  if (typeof msg !== 'string') {
+    props = msg
+    msg = statuses[status]
+  }
 
-  // constructor
-  var HttpError = createError[status] || createError[codeClass(status)]
+  // If status is a code not in statuses, we default to the
+  // the class of the code (so 499 becomes 400 and etc.)
+  var code = statuses[status] ? status : helper.codeClass(status)
 
+  // If we don't have the error class cached, create it.
+  if (!__cache.has(code)) {
+    __cache.set(code, createErrorConstructor(helper.toIdentifier(statuses[code]), code))
+  }
+
+  // Grab our error class from cache
+  var CreateHttpError = __cache.get(code)
+
+  // If we were not passed an error class, we make our own
+  // based on the code and capture the stacktrace.
   if (!err) {
-    // create error
-    err = HttpError
-      ? new HttpError(msg)
-      : new Error(msg || statuses[status])
+    err = new CreateHttpError(msg)
     Error.captureStackTrace(err, createError)
   }
 
-  if (!HttpError || !(err instanceof HttpError) || err.status !== status) {
-    // add properties to generic error
+  // Override the 
+  if (!(err instanceof HttpError) || err.status !== status) {
+    // add properties to the generic error
     err.expose = status < 500
     err.status = err.statusCode = status
   }
 
+  // Loop over props and add all the properties
+  // to the current output error
   for (var key in props) {
     if (key !== 'status' && key !== 'statusCode') {
       err[key] = props[key]
@@ -110,26 +101,11 @@ function createError () {
 }
 
 /**
- * Create HTTP error abstract base class.
+ * Create a constructor for an http error
  * @private
  */
 
-function createHttpErrorConstructor () {
-  function HttpError () {
-    throw new TypeError('cannot construct abstract class')
-  }
-
-  inherits(HttpError, Error)
-
-  return HttpError
-}
-
-/**
- * Create a constructor for a client error.
- * @private
- */
-
-function createClientErrorConstructor (HttpError, name, code) {
+function createErrorConstructor (name, code) {
   var className = name.match(/Error$/) ? name : name + 'Error'
 
   function ClientError (message) {
@@ -141,9 +117,8 @@ function createClientErrorConstructor (HttpError, name, code) {
     Error.captureStackTrace(err, ClientError)
 
     // adjust the [[Prototype]]
-    setPrototypeOf(err, ClientError.prototype)
+    Object.setPrototypeOf(err, ClientError.prototype)
 
-    // redefine the error message
     Object.defineProperty(err, 'message', {
       enumerable: true,
       configurable: true,
@@ -162,105 +137,31 @@ function createClientErrorConstructor (HttpError, name, code) {
     return err
   }
 
-  inherits(ClientError, HttpError)
-  nameFunc(ClientError, className)
+  util.inherits(ClientError, HttpError)
+
+  // Override the name of the function
+  var desc = Object.getOwnPropertyDescriptor(ClientError, 'name')
+  if (desc && desc.configurable) {
+    desc.value = className
+    Object.defineProperty(ClientError, 'name', desc)
+  }
 
   ClientError.prototype.status = code
   ClientError.prototype.statusCode = code
-  ClientError.prototype.expose = true
+
+  if (code >= 500) {
+    ClientError.prototype.expose = false
+  } else {
+    ClientError.prototype.expose = true
+  }
 
   return ClientError
 }
 
 /**
- * Create a constructor for a server error.
- * @private
+ * Module exports.
+ * @public
  */
 
-function createServerErrorConstructor (HttpError, name, code) {
-  var className = name.match(/Error$/) ? name : name + 'Error'
-
-  function ServerError (message) {
-    // create the error object
-    var msg = message != null ? message : statuses[code]
-    var err = new Error(msg)
-
-    // capture a stack trace to the construction point
-    Error.captureStackTrace(err, ServerError)
-
-    // adjust the [[Prototype]]
-    setPrototypeOf(err, ServerError.prototype)
-
-    // redefine the error message
-    Object.defineProperty(err, 'message', {
-      enumerable: true,
-      configurable: true,
-      value: msg,
-      writable: true
-    })
-
-    // redefine the error name
-    Object.defineProperty(err, 'name', {
-      enumerable: false,
-      configurable: true,
-      value: className,
-      writable: true
-    })
-
-    return err
-  }
-
-  inherits(ServerError, HttpError)
-  nameFunc(ServerError, className)
-
-  ServerError.prototype.status = code
-  ServerError.prototype.statusCode = code
-  ServerError.prototype.expose = false
-
-  return ServerError
-}
-
-/**
- * Set the name of a function, if possible.
- * @private
- */
-
-function nameFunc (func, name) {
-  var desc = Object.getOwnPropertyDescriptor(func, 'name')
-
-  if (desc && desc.configurable) {
-    desc.value = name
-    Object.defineProperty(func, 'name', desc)
-  }
-}
-
-/**
- * Populate the exports object with constructors for every error class.
- * @private
- */
-
-function populateConstructorExports (exports, codes, HttpError) {
-  codes.forEach(function forEachCode (code) {
-    var CodeError
-    var name = toIdentifier(statuses[code])
-
-    switch (codeClass(code)) {
-      case 400:
-        CodeError = createClientErrorConstructor(HttpError, name, code)
-        break
-      case 500:
-        CodeError = createServerErrorConstructor(HttpError, name, code)
-        break
-    }
-
-    if (CodeError) {
-      // export the constructor
-      exports[code] = CodeError
-      exports[name] = CodeError
-    }
-  })
-
-  // backwards-compatibility
-  exports["I'mateapot"] = deprecate.function(exports.ImATeapot,
-    '"I\'mateapot"; use "ImATeapot" instead')
-}
+module.exports = createError
+module.exports.HttpError = HttpError

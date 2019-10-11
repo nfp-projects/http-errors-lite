@@ -1,4 +1,4 @@
-# http-errors
+# http-errors-lite
 
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Downloads][npm-downloads-image]][node-url]
@@ -15,13 +15,13 @@ This is a [Node.js](https://nodejs.org/en/) module available through the
 [`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
 
 ```bash
-$ npm install http-errors
+$ npm install http-errors-lite
 ```
 
 ## Example
 
 ```js
-var createError = require('http-errors')
+var createError = require('http-errors-lite')
 var express = require('express')
 var app = express()
 
@@ -88,76 +88,16 @@ fs.readFile('foo.txt', function (err, buf) {
 - `error` - the error object to extend
 - `properties` - custom properties to attach to the object
 
-### new createError\[code || name\](\[msg]\))
-
-Create a new error object with the given message `msg`.
-The error object inherits from `createError.HttpError`.
-
-<!-- eslint-disable no-undef, no-unused-vars -->
-
-```js
-var err = new createError.NotFound()
-```
-
-- `code` - the status code as a number
-- `name` - the name of the error as a "bumpy case", i.e. `NotFound` or `InternalServerError`.
-
-#### List of all constructors
-
-|Status Code|Constructor Name             |
-|-----------|-----------------------------|
-|400        |BadRequest                   |
-|401        |Unauthorized                 |
-|402        |PaymentRequired              |
-|403        |Forbidden                    |
-|404        |NotFound                     |
-|405        |MethodNotAllowed             |
-|406        |NotAcceptable                |
-|407        |ProxyAuthenticationRequired  |
-|408        |RequestTimeout               |
-|409        |Conflict                     |
-|410        |Gone                         |
-|411        |LengthRequired               |
-|412        |PreconditionFailed           |
-|413        |PayloadTooLarge              |
-|414        |URITooLong                   |
-|415        |UnsupportedMediaType         |
-|416        |RangeNotSatisfiable          |
-|417        |ExpectationFailed            |
-|418        |ImATeapot                    |
-|421        |MisdirectedRequest           |
-|422        |UnprocessableEntity          |
-|423        |Locked                       |
-|424        |FailedDependency             |
-|425        |UnorderedCollection          |
-|426        |UpgradeRequired              |
-|428        |PreconditionRequired         |
-|429        |TooManyRequests              |
-|431        |RequestHeaderFieldsTooLarge  |
-|451        |UnavailableForLegalReasons   |
-|500        |InternalServerError          |
-|501        |NotImplemented               |
-|502        |BadGateway                   |
-|503        |ServiceUnavailable           |
-|504        |GatewayTimeout               |
-|505        |HTTPVersionNotSupported      |
-|506        |VariantAlsoNegotiates        |
-|507        |InsufficientStorage          |
-|508        |LoopDetected                 |
-|509        |BandwidthLimitExceeded       |
-|510        |NotExtended                  |
-|511        |NetworkAuthenticationRequired|
-
 ## License
 
 [MIT](LICENSE)
 
-[coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/http-errors/master
-[coveralls-url]: https://coveralls.io/r/jshttp/http-errors?branch=master
-[node-image]: https://badgen.net/npm/node/http-errors
+[coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/http-errors-lite/master
+[coveralls-url]: https://coveralls.io/r/jshttp/http-errors-lite?branch=master
+[node-image]: https://badgen.net/npm/node/http-errors-lite
 [node-url]: https://nodejs.org/en/download
-[npm-downloads-image]: https://badgen.net/npm/dm/http-errors
-[npm-url]: https://npmjs.org/package/http-errors
-[npm-version-image]: https://badgen.net/npm/v/http-errors
-[travis-image]: https://badgen.net/travis/jshttp/http-errors/master
-[travis-url]: https://travis-ci.org/jshttp/http-errors
+[npm-downloads-image]: https://badgen.net/npm/dm/http-errors-lite
+[npm-url]: https://npmjs.org/package/http-errors-lite
+[npm-version-image]: https://badgen.net/npm/v/http-errors-lite
+[travis-image]: https://badgen.net/travis/jshttp/http-errors-lite/master
+[travis-url]: https://travis-ci.org/jshttp/http-errors-lite
