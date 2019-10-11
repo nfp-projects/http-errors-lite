@@ -4,9 +4,8 @@
 [![NPM Downloads][npm-downloads-image]][node-url]
 [![Node.js Version][node-image]][node-url]
 [![Build Status][travis-image]][travis-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
 
-Create HTTP errors for Express, Koa, Connect, etc. with ease.
+Create HTTP errors for Express, Koa, Connect, etc. with ease. This is a drop-in replacement for the normal `http-errors` only with zero dependancies and 50% less memory usage (give or take).
 
 ## Install
 
@@ -92,12 +91,8 @@ fs.readFile('foo.txt', function (err, buf) {
 
 [MIT](LICENSE)
 
-[coveralls-image]: https://badgen.net/coveralls/c/github/jshttp/http-errors-lite/master
-[coveralls-url]: https://coveralls.io/r/jshttp/http-errors-lite?branch=master
 [node-image]: https://badgen.net/npm/node/http-errors-lite
 [node-url]: https://nodejs.org/en/download
 [npm-downloads-image]: https://badgen.net/npm/dm/http-errors-lite
 [npm-url]: https://npmjs.org/package/http-errors-lite
-[npm-version-image]: https://badgen.net/npm/v/http-errors-lite
-[travis-image]: https://badgen.net/travis/jshttp/http-errors-lite/master
-[travis-url]: https://travis-ci.org/jshttp/http-errors-lite
+[travis-url]: https://travis-ci.org/nfp-projects/http-errors-lite
