@@ -1,5 +1,5 @@
 {
-  "name": "http-errors",
+  "name": "http-errors-lite",
   "description": "Create HTTP error objects",
   "version": "2.0.0",
   "author": "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)",
@@ -8,7 +8,7 @@
     "Douglas Christopher Wilson <doug@somethingdoug.com>"
   ],
   "license": "MIT",
-  "repository": "jshttp/http-errors",
+  "repository": "nfp-projects/http-errors-lite",
   "dependencies": {},
   "devDependencies": {
     "eslint": "5.16.0",
