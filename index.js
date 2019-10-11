@@ -82,7 +82,8 @@ function createError (orgStatus, orgMessage, orgProps) {
     Error.captureStackTrace(err, createError)
   }
 
-  // Override the 
+  // If we're dealing with an outside error, make sure it has
+  // the common properties of status and expose.
   if (!(err instanceof HttpError) || err.status !== status) {
     // add properties to the generic error
     err.expose = status < 500
