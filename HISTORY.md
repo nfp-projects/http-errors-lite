@@ -1,3 +1,10 @@
+2019-10-11 / 2.0.1
+==================
+
+  * Major refactoring
+  * Removed all dependancies
+  * Smarter controller (less memory usage)
+
 2019-06-24 / 1.7.3
 ==================
 
